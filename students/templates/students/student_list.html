@@ -1,0 +1,53 @@
+{% extends 'students/base.html' %}
+
+{% block content %}
+
+<div class="top-bar">
+    <div>
+        <div class="title">Student Records</div>
+        <p>Total students: {{ students|length }}</p>
+    </div>
+
+    <a class="btn" href="{% url 'add_student' %}">+ Add Student</a>
+</div>
+
+{% if students %}
+
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Department</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Attendance</th>
+        <th>Marks</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for student in students %}
+    <tr>
+        <td><strong>{{ student.name }}</strong></td>
+        <td>{{ student.age }}</td>
+        <td>{{ student.department }}</td>
+        <td>{{ student.email }}</td>
+        <td>{{ student.phone }}</td>
+        <td>{{ student.attendance }}%</td>
+        <td>{{ student.marks }}</td>
+        <td>
+            <a class="btn btn-edit" href="{% url 'update_student' student.id %}">Edit</a>
+            <a class="btn btn-delete" href="{% url 'delete_student' student.id %}">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% else %}
+
+<div class="empty-box">
+    No student records found. Add your first student.
+</div>
+
+{% endif %}
+
+{% endblock %}

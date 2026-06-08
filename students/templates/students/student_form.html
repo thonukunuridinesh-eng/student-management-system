@@ -1,0 +1,39 @@
+{% extends 'students/base.html' %}
+
+{% block content %}
+
+<div class="form-page">
+
+    <div class="form-header">
+        <div>
+            <span class="badge">Student Profile</span>
+            <h1>Add / Update Student</h1>
+            <p>Enter student details carefully and keep records professional.</p>
+        </div>
+
+        <a class="btn back-btn" href="{% url 'student_list' %}">← Back</a>
+    </div>
+
+    <form method="POST" class="premium-form">
+        {% csrf_token %}
+
+        <div class="form-grid">
+            {% for field in form %}
+            <div class="input-group">
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <small>{{ field.errors }}</small>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <button class="btn save-btn" type="submit">
+            Save Student
+        </button>
+    </form>
+
+</div>
+
+{% endblock %}
