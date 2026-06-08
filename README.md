@@ -48,13 +48,8 @@ A modern and visually appealing Student Management System built using Django. Th
 
 ![Dashboard](screenshots/dashboard.png)
 
-### Add Student
 
-![Add Student](screenshots/add-student.png)
 
-### Student List
-
-![Student List](screenshots/student-list.png)
 
 ### Mobile Responsive View
 
