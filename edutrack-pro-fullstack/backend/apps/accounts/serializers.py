@@ -1,0 +1,81 @@
+from django.contrib.auth.password_validation import validate_password
+from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+from .models import User
+
+
+class UserSerializer(serializers.ModelSerializer):
+    full_name = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "email",
+            "username",
+            "first_name",
+            "last_name",
+            "full_name",
+            "role",
+            "phone",
+            "avatar",
+            "is_active",
+            "date_joined",
+        )
+        read_only_fields = ("id", "username", "role", "is_active", "date_joined")
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, min_length=8)
+    password_confirm = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "role",
+            "phone",
+            "password",
+            "password_confirm",
+        )
+        read_only_fields = ("id",)
+
+    def validate_role(self, value):
+        if value == User.Role.ADMIN:
+            raise serializers.ValidationError("Admin users must be created from Django Admin.")
+        return value
+
+    def validate(self, attrs):
+        password = attrs.get("password")
+        password_confirm = attrs.pop("password_confirm", None)
+
+        if password != password_confirm:
+            raise serializers.ValidationError({"password_confirm": "Passwords do not match."})
+
+        validate_password(password)
+        return attrs
+
+    def create(self, validated_data):
+        password = validated_data.pop("password")
+        return User.objects.create_user(password=password, **validated_data)
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = User.EMAIL_FIELD
+
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token["email"] = user.email
+        token["role"] = user.role
+        token["full_name"] = user.full_name
+        return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data["user"] = UserSerializer(self.user, context=self.context).data
+        return data
